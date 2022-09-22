@@ -16,19 +16,18 @@ class DragEventHandler(QtCore.QObject):
 			start_pos = get_QPoint_value(self.startPos)
 			print start_pos
 			return True
+
 		elif event.type() == QtCore.QEvent.MouseMove and self.startPos is not None:
 			current_pos = get_QPoint_value(event.pos())
 			print current_pos
-			x_diff = float(start_pos[0] - current_pos[0])/150 + .001
-			y_diff = float(current_pos[1] - start_pos[1])/200 + .001
 			return True
+		
 		elif event.type() == QtCore.QEvent.MouseButtonRelease and self.startPos is not None:
 			self.startPos = None
 			print 'stop'
-			app.removeEventFilter(self)
+			#app.removeEventFilter(self)
 			return True
-		elif event.type() == QtCore.QEvent.KeyPress:
-			print event.text()
+		
 		return super(DragEventHandler, self).eventFilter(source, event)
 		
 def get_QPoint_value(QPoint):
@@ -37,7 +36,27 @@ def get_QPoint_value(QPoint):
 	y_val = int(val_str.split(', ',1)[1][:-1])
 	return x_val, y_val
 
-handler = DragEventHandler()
+def run(pressOrRelease):
+	if pressOrRelease == 'press':
+		#mc.undoInfo(openChunk=1)
+		app.installEventFilter(handler)
+		print 'pressed'
+	if pressOrRelease == 'release':
+		app.removeEventFilter(handler)
+		print 'released'
+
+
 app = QApplication.instance()
-mc.undoInfo(openChunk=1)
-app.installEventFilter(handler)
+handler = DragEventHandler()
+
+'''
+import sys
+
+try:
+    del sys.modules['mouseDrag']
+except:
+    pass
+sys.path.append( '/net/homedirs/tchen/Documents' )
+
+import mouseDrag
+'''
