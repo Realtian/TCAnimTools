@@ -1,0 +1,13 @@
+from pymel import core
+def match_transform(source, target):
+    worldPos = core.xform(source, q=1, rp=1, ws=1)
+    worldRot = core.xform(source, q=1, ro=1, ws=1)
+    core.setAttr(target.tx, worldPos[0])
+    core.setAttr(target.ty, worldPos[1])
+    core.setAttr(target.tz, worldPos[2])
+    core.setAttr(target.rx, worldRot[0])
+    core.setAttr(target.ry, worldRot[1])
+    core.setAttr(target.rz, worldRot[2])
+
+sel = core.ls(sl=1)
+match_transform(sel[0], sel[1])
