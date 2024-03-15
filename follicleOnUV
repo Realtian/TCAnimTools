@@ -1,0 +1,35 @@
+
+#create follicle node on selected UV vertex
+
+
+from pymel import core
+
+
+def create_foll_on_UV(uv_sel):
+    uv_list = []
+    for i in uv_sel:
+        #get UV index 
+        uv_index = (str(i).split('.map[')[1]).split("]")[0]
+        #get UV coords
+        core.select(i)
+        u_val = core.polyEditUV(q=1)[0]
+        v_val = core.polyEditUV(q=1)[1]
+        core.select(clear=1)
+        #store nodes
+        geo_shape = core.ls( i, o = True )[0]
+        geo_shape_name = str(geo_shape).split("'")
+        foll_transform = core.createNode( 'transform', n = geo_shape_name[0] + 'UV' + uv_index + '_xx_foll' )
+        foll_shape = core.createNode('follicle', p = foll_transform, n = geo_shape_name[0] + 'UV' + uv_index + '_xx_follShape' )
+        #connect nodes
+        core.connectAttr( geo_shape + '.outMesh', foll_shape + '.inputMesh')
+
+        core.connectAttr( geo_shape + '.worldMatrix[0]', foll_shape + '.inputWorldMatrix')
+        core.connectAttr( foll_shape.outTranslate, foll_transform.translate)
+        core.connectAttr( foll_shape.outRotate, foll_transform.rotate)
+        core.setAttr( foll_shape.parameterU, u_val)
+        core.setAttr( foll_shape.parameterV, v_val)
+        uv_list.append(foll_transform)
+
+    return uv_list
+sel = core.ls(sl=1, fl=1)
+create_foll_on_UV(sel)
