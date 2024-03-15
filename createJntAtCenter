@@ -1,0 +1,8 @@
+from pymel import core
+sel = core.ls(sl=1)
+sel_boundingBox = core.exactWorldBoundingBox(sel)
+sel_center = [(sel_boundingBox[0] + sel_boundingBox[3])/2, 
+              (sel_boundingBox[1] + sel_boundingBox[4])/2,
+              (sel_boundingBox[2] + sel_boundingBox[5])/2]
+loc = core.createNode('joint')
+core.move(sel_center)
