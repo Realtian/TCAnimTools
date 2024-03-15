@@ -1,0 +1,15 @@
+from pymel import core
+def connect_all(src, tgt):
+    core.connectAttr(src+'.translateX', tgt+'.translateX')
+    core.connectAttr(src+'.translateY', tgt+'.translateY')
+    core.connectAttr(src+'.translateZ', tgt+'.translateZ')
+    
+    core.connectAttr(src+'.rotateX', tgt+'.rotateX')
+    core.connectAttr(src+'.rotateY', tgt+'.rotateY')
+    core.connectAttr(src+'.rotateZ', tgt+'.rotateZ')
+    
+    core.connectAttr(src+'.scaleX', tgt+'.scaleX')
+    core.connectAttr(src+'.scaleY', tgt+'.scaleY')
+    core.connectAttr(src+'.scaleZ', tgt+'.scaleZ')
+sel = core.ls(sl=1)
+connect_all(sel[0], sel[1])
