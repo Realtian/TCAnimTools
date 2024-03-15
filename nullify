@@ -1,0 +1,42 @@
+from pymel import core
+
+
+def match_transform(source, target):
+    worldPos = core.xform(source, q=1, rp=1, ws=1)
+    worldRot = core.xform(source, q=1, ro=1, ws=1)
+    core.setAttr(target.tx, worldPos[0])
+    core.setAttr(target.ty, worldPos[1])
+    core.setAttr(target.tz, worldPos[2])
+    core.setAttr(target.rx, worldRot[0])
+    core.setAttr(target.ry, worldRot[1])
+    core.setAttr(target.rz, worldRot[2])
+
+
+
+def nullify(obj):
+	name = str(obj)
+	parent_node = core.listRelatives( obj, p = True )
+
+
+	original_suffix = name.split('_')[-1]
+	original_prefix = name.split('_')[0]
+	original_baseName = name.split('_')[1]
+	original_iter = name.split('_')[-2]
+	new_baseName = original_baseName + original_suffix.capitalize()
+	new_name = original_prefix + '_' + new_baseName + '_' + original_iter + '_offset'
+
+
+	null = core.createNode('transform', n = new_name )
+	match_transform(obj, null)
+	if core.listRelatives( obj, p = True ) == []:
+		pass
+	else:
+		core.parent(null, parent_node[0])
+	core.parent(obj, null)
+
+
+sel = core.ls(sl=1)
+for i in sel:
+	obj_name = str(i)
+	nullify(i)
+
