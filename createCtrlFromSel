@@ -1,0 +1,67 @@
+from pymel import core
+
+def connect_all(src, tgt):
+    core.connectAttr(src+'.translateX', tgt+'.translateX')
+    core.connectAttr(src+'.translateY', tgt+'.translateY')
+    core.connectAttr(src+'.translateZ', tgt+'.translateZ')
+    
+    core.connectAttr(src+'.rotateX', tgt+'.rotateX')
+    core.connectAttr(src+'.rotateY', tgt+'.rotateY')
+    core.connectAttr(src+'.rotateZ', tgt+'.rotateZ')
+    
+    core.connectAttr(src+'.scaleX', tgt+'.scaleX')
+    core.connectAttr(src+'.scaleY', tgt+'.scaleY')
+    core.connectAttr(src+'.scaleZ', tgt+'.scaleZ')
+
+def match_transform(source, target):
+    worldPos = core.xform(source, q=1, rp=1, ws=1)
+    worldRot = core.xform(source, q=1, ro=1, ws=1)
+    core.setAttr(target.tx, worldPos[0])
+    core.setAttr(target.ty, worldPos[1])
+    core.setAttr(target.tz, worldPos[2])
+    core.setAttr(target.rx, worldRot[0])
+    core.setAttr(target.ry, worldRot[1])
+    core.setAttr(target.rz, worldRot[2])
+
+def nullify(obj):
+    name = str(obj)
+    parent_node = core.listRelatives( obj, p = True )
+
+    original_suffix = name.split('_')[-1]
+    original_baseName = name.split('_')[0]
+    new_baseName = original_baseName + original_suffix.capitalize()
+    middle_elements = name.split('_')[1:-1]
+    middle_str = '_'.join(middle_elements)
+    new_name = new_baseName + '_' + middle_str + '_offset'
+
+    null = core.createNode('transform', n = new_name )
+    match_transform(obj, null)
+    if core.listRelatives( obj, p = True ) == []:
+        pass
+    else:
+        core.parent(null, parent_node[0])
+    core.parent(obj, null)
+
+def create_ctrl(obj):
+    name = str(obj)
+
+    original_suffix = name.split('_')[-1]
+    original_baseName = name.split('_')[0]
+    middle_elements = name.split('_')[1:-1]
+    middle_str = '_'.join(middle_elements)
+    new_name = original_baseName + '_' + middle_str + '_ctrl'
+    
+    ctrl_node = core.circle( n = new_name )
+    ctrl_node_trans = ctrl_node[0]
+    core.delete(ctrl_node[1])
+    
+    match_transform(obj, ctrl_node_trans)
+    nullify(ctrl_node_trans)
+    connect_all(ctrl_node_trans, obj)
+
+sel = core.ls(sl=1)
+for i in sel:
+    obj_name = str(i)
+    create_ctrl(i)
+
+
